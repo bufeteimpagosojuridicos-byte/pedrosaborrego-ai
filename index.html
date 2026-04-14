@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ObraControl GPS - Control de Presencia en Obra</title>
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" type="image/png" href="icon-192.png">
+  <meta name="theme-color" content="#0A1628">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <link rel="apple-touch-icon" href="icon-192.png">
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800;900&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --azul: #1B4F8C;
+      --azul-oscuro: #0A1628;
+      --naranja: #FF6B35;
+      --blanco: #FFFFFF;
+      --gris-claro: #F4F7FA;
+      --gris: #64748B;
+      --verde: #16A34A;
+    }
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body {
+      font-family: 'Inter', sans-serif;
+      background: linear-gradient(135deg, var(--azul-oscuro) 0%, #1B3A6B 50%, var(--azul-oscuro) 100%);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 20px;
+    }
+    
+    .container {
+      width: 100%;
+      max-width: 500px;
+    }
+    
+    /* Logo */
+    .logo-section {
+      text-align: center;
+      padding: 30px 0;
+    }
+    .logo-svg {
+      width: 280px;
+      max-width: 80%;
+      height: auto;
+      margin-bottom: 10px;
+    }
+    .tagline {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 14px;
+      color: var(--gris);
+      letter-spacing: 2px;
+    }
+    
+    /* Badge gratis */
+    .badge-gratis {
+      display: inline-block;
+      background: var(--verde);
+      color: white;
+      padding: 8px 20px;
+      border-radius: 20px;
+      font-family: 'Montserrat', sans-serif;
+      font-size: 12px;
+      font-weight: 700;
+      margin-top: 15px;
+      animation: pulse 2s infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+    }
+    
+    /* Cards de acceso */
+    .access-cards {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+      margin: 25px 0;
+    }
+    .access-card {
+      background: rgba(255,255,255,0.97);
+      border-radius: 16px;
+      padding: 20px;
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .access-card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 12px 32px rgba(0,0,0,0.2);
+    }
+    .card-icon {
+      width: 60px;
+      height: 60px;
+      border-radius: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 28px;
+      flex-shrink: 0;
+    }
+    .card-icon.operario { background: linear-gradient(135deg, var(--naranja), #E85A2A); }
+    .card-icon.oficina { background: linear-gradient(135deg, var(--azul), #14407A); }
+    .card-icon.dossier { background: linear-gradient(135deg, var(--verde), #128A3E); }
+    .card-content h3 {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 16px;
+      font-weight: 800;
+      color: var(--azul-oscuro);
+      margin-bottom: 4px;
+    }
+    .card-content p {
+      font-size: 12px;
+      color: var(--gris);
+      line-height: 1.4;
+    }
+    .card-arrow {
+      margin-left: auto;
+      font-size: 20px;
+      color: var(--gris);
+    }
+    
+    /* Botón instalar */
+    .install-section {
+      background: rgba(255,255,255,0.1);
+      border: 2px dashed rgba(255,255,255,0.3);
+      border-radius: 16px;
+      padding: 20px;
+      text-align: center;
+      margin: 20px 0;
+    }
+    .install-section h4 {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 14px;
+      font-weight: 700;
+      color: white;
+      margin-bottom: 8px;
+    }
+    .install-section p {
+      font-size: 11px;
+      color: rgba(255,255,255,0.7);
+      margin-bottom: 15px;
+    }
+    .install-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      background: linear-gradient(135deg, var(--naranja), #E85A2A);
+      color: white;
+      border: none;
+      padding: 14px 28px;
+      border-radius: 12px;
+      font-family: 'Montserrat', sans-serif;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      box-shadow: 0 4px 16px rgba(255,107,53,0.3);
+      transition: transform 0.2s;
+    }
+    .install-btn:hover { transform: scale(1.03); }
+    
+    /* iOS instructions */
+    .ios-instructions {
+      background: rgba(27,79,140,0.2);
+      border: 1px solid rgba(27,79,140,0.4);
+      border-radius: 12px;
+      padding: 15px;
+      margin-top: 15px;
+      font-size: 11px;
+      color: rgba(255,255,255,0.85);
+      line-height: 1.6;
+      display: none;
+    }
+    .ios-instructions strong { color: var(--naranja); }
+    
+    /* Precios */
+    .precios-section {
+      background: rgba(255,255,255,0.05);
+      border-radius: 16px;
+      padding: 20px;
+      margin: 20px 0;
+    }
+    .precios-title {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 14px;
+      font-weight: 700;
+      color: white;
+      text-align: center;
+      margin-bottom: 15px;
+    }
+    .precio-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 10px 0;
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+      font-size: 13px;
+      color: rgba(255,255,255,0.85);
+    }
+    .precio-row:last-child { border-bottom: none; }
+    .precio-row span:last-child { 
+      font-weight: 700; 
+      color: var(--naranja);
+    }
+    .precio-gratis {
+      background: var(--verde);
+      color: white;
+      padding: 3px 10px;
+      border-radius: 10px;
+      font-size: 11px;
+      font-weight: 700;
+    }
+    .precio-incluido {
+      text-align: center;
+      font-size: 10px;
+      color: rgba(255,255,255,0.6);
+      margin-top: 12px;
+      padding-top: 12px;
+      border-top: 1px solid rgba(255,255,255,0.1);
+    }
+    
+    /* Footer */
+    .footer {
+      text-align: center;
+      padding: 25px 0;
+      border-top: 1px solid rgba(255,255,255,0.1);
+      margin-top: 20px;
+    }
+    .footer-email {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 14px;
+      font-weight: 600;
+      color: white;
+      text-decoration: none;
+    }
+    .footer-legal {
+      font-size: 10px;
+      color: rgba(255,255,255,0.5);
+      margin-top: 10px;
+      line-height: 1.6;
+    }
+    
+    /* Barra naranja */
+    .bar-top, .bar-bottom {
+      position: fixed;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: var(--naranja);
+    }
+    .bar-top { top: 0; }
+    .bar-bottom { bottom: 0; }
+  </style>
+</head>
+<body>
+
+<div class="bar-top"></div>
+
+<div class="container">
+  
+  <!-- LOGO -->
+  <div class="logo-section">
+    <svg class="logo-svg" viewBox="0 0 400 320" xmlns="http://www.w3.org/2000/svg">
+      <!-- Pin GPS exterior -->
+      <path d="M200 20 C255 20 300 65 300 120 C300 195 200 260 200 260 C200 260 100 195 100 120 C100 65 145 20 200 20Z" fill="#1B4F8C"/>
+      <!-- Círculo interior -->
+      <circle cx="200" cy="110" r="65" fill="#0A1628"/>
+      <!-- Edificio dentro del pin -->
+      <rect x="170" y="70" width="60" height="80" fill="white" rx="3"/>
+      <rect x="150" y="95" width="28" height="55" fill="none" stroke="white" stroke-width="5"/>
+      <rect x="222" y="85" width="24" height="65" fill="none" stroke="white" stroke-width="5"/>
+      <!-- Ventanas -->
+      <rect x="180" y="80" width="14" height="10" fill="#0A1628" rx="2"/>
+      <rect x="200" y="80" width="14" height="10" fill="#0A1628" rx="2"/>
+      <rect x="180" y="98" width="14" height="10" fill="#0A1628" rx="2"/>
+      <rect x="200" y="98" width="14" height="10" fill="#0A1628" rx="2"/>
+      <rect x="180" y="116" width="14" height="10" fill="#0A1628" rx="2"/>
+      <rect x="200" y="116" width="14" height="10" fill="#0A1628" rx="2"/>
+      <!-- Señal GPS -->
+      <path d="M270 60 Q300 95 270 130" fill="none" stroke="#FF6B35" stroke-width="7" stroke-linecap="round"/>
+      <path d="M290 42 Q330 95 290 148" fill="none" stroke="#FF6B35" stroke-width="7" stroke-linecap="round" opacity="0.5"/>
+      <!-- Texto OBRACONTROL -->
+      <text x="200" y="290" text-anchor="middle" font-family="Montserrat,Arial" font-size="44" font-weight="800" fill="#FFFFFF" letter-spacing="3">OBRACONTROL</text>
+      <text x="200" y="315" text-anchor="middle" font-family="Montserrat,Arial" font-size="24" font-weight="300" fill="#FF6B35" letter-spacing="12">G P S</text>
+    </svg>
+    <div class="tagline">CONTROL DE PRESENCIA EN OBRA</div>
+    <div class="badge-gratis">🎁 PRIMER MES GRATIS</div>
+  </div>
+  
+  <!-- ACCESOS -->
+  <div class="access-cards">
+    
+    <a href="obracontrol-operario-demo.html" class="access-card">
+      <div class="card-icon operario">📱</div>
+      <div class="card-content">
+        <h3>App Operario</h3>
+        <p>Fichaje de entrada/salida con GPS para trabajadores</p>
+      </div>
+      <div class="card-arrow">→</div>
+    </a>
+    
+    <a href="obracontrol-oficina-demo.html" class="access-card">
+      <div class="card-icon oficina">🏢</div>
+      <div class="card-content">
+        <h3>Panel de Oficina</h3>
+        <p>Dashboard de control para encargados y administración</p>
+      </div>
+      <div class="card-arrow">→</div>
+    </a>
+    
+    <a href="ObraControl-GPS-Dossier.pdf" class="access-card" download>
+      <div class="card-icon dossier">📄</div>
+      <div class="card-content">
+        <h3>Dossier + Formación</h3>
+        <p>Manual completo de uso y características (PDF)</p>
+      </div>
+      <div class="card-arrow">⬇</div>
+    </a>
+    
+  </div>
+  
+  <!-- INSTALAR -->
+  <div class="install-section">
+    <h4>📲 Añadir a Pantalla de Inicio</h4>
+    <p>Instala ObraControl GPS como una app en tu móvil</p>
+    <button class="install-btn" id="installBtn" onclick="installApp()">
+      <span>📲</span> Instalar App
+    </button>
+    <div class="ios-instructions" id="iosInstructions">
+      <strong>En iPhone/iPad:</strong><br>
+      1. Toca el botón <strong>Compartir</strong> ⬆️<br>
+      2. Selecciona <strong>"Añadir a pantalla de inicio"</strong><br>
+      3. Toca <strong>"Añadir"</strong>
+    </div>
+  </div>
+  
+  <!-- PRECIOS -->
+  <div class="precios-section">
+    <div class="precios-title">💰 Precios Transparentes</div>
+    <div class="precio-row">
+      <span>Primer mes</span>
+      <span class="precio-gratis">GRATIS</span>
+    </div>
+    <div class="precio-row">
+      <span>3 - 10 operarios</span>
+      <span>25€/mes</span>
+    </div>
+    <div class="precio-row">
+      <span>10 - 25 operarios</span>
+      <span>35€/mes</span>
+    </div>
+    <div class="precio-row">
+      <span>25 - 50 operarios</span>
+      <span>48€/mes</span>
+    </div>
+    <div class="precio-incluido">
+      ✅ Actualizaciones y personalización incluidas
+    </div>
+  </div>
+  
+  <!-- FOOTER -->
+  <div class="footer">
+    <a href="mailto:info@obracontrolgps.net" class="footer-email">✉️ info@obracontrolgps.net</a>
+    <div class="footer-legal">
+      Cumple Art. 34.9 Estatuto de los Trabajadores<br>
+      RGPD · LOPDGDD
+    </div>
+  </div>
+  
+</div>
+
+<div class="bar-bottom"></div>
+
+<script>
+// PWA Install
+let deferredPrompt;
+
+window.addEventListener('beforeinstallprompt', (e) => {
+  e.preventDefault();
+  deferredPrompt = e;
+  document.getElementById('installBtn').style.display = 'inline-flex';
+});
+
+function installApp() {
+  if (deferredPrompt) {
+    deferredPrompt.prompt();
+    deferredPrompt.userChoice.then((choiceResult) => {
+      if (choiceResult.outcome === 'accepted') {
+        console.log('App instalada');
+      }
+      deferredPrompt = null;
+    });
+  } else {
+    // iOS o navegador que no soporta PWA install
+    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+    if (isIOS) {
+      document.getElementById('iosInstructions').style.display = 'block';
+    } else {
+      alert('Para instalar: Abre el menú del navegador y selecciona "Añadir a pantalla de inicio"');
+    }
+  }
+}
+
+// Detectar iOS y mostrar instrucciones
+const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+const isInStandaloneMode = ('standalone' in window.navigator) && (window.navigator.standalone);
+if (isIOS && !isInStandaloneMode) {
+  document.getElementById('iosInstructions').style.display = 'block';
+}
+</script>
+
+</body>
+</html>
